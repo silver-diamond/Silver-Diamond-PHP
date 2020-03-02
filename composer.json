@@ -1,0 +1,15 @@
+{
+    "name": "rulilg/silver-diamond-php",
+    "description": "PHP Library that provides easy access to the Silver Diamond Artificial Intelligence API",
+    "type": "library",
+    "require": {
+        "php-curl-class/php-curl-class": "^8.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raúl López",
+            "email": "hi@raullg.com"
+        }
+    ]
+}
