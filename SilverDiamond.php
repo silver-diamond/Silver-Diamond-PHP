@@ -8,7 +8,7 @@ class Api {
     private $key;
     private $curl;
 
-    public function __construct (string $key) {
+    public function __construct ($key) {
         $this->key = $key;
         $this->curl = new Curl();
         $this->curl->setHeader('Authorization', 'Bearer ' . $this->key);
@@ -23,8 +23,13 @@ class Api {
         if ($this->curl->error) {
             throw new Exception($this->curl->error);
         }
+        var_dump();
+        if (!is_string($this->curl->response)) {
+            $response = json_decode(json_encode($this->curl->response), true);
+        } else {
+            $response = json_decode($this->curl->response, true);
+        }
 
-        $response = json_decode($this->curl->response, true);
         if (!$response) {
             throw new Exception('Unknown error');
         }
@@ -44,26 +49,25 @@ class Api {
 class Exception extends \Exception {}
 
 class SilverDiamond {
-    private static $instance = null;
+    private $instance = null;
 
-    public static function init (string $key) {
-        die('hola');
-        self::$instance = new Api($key);
+    public function __construct ($key) {
+        $this->instance = new Api($key);
     }
 
     /**
-     * Returns true if the discovered language is equals to $isoCode
+     * Returns the iso code of the detected `$text` language
      *
      * @param string $isoCode
      * @return void
      */
-    public static function detectLanguage (string $text) {
+    public function detectLanguage ($text) {
         $text = trim($text);
         if (empty($text)) {
             throw new Exception('Text must not be empty');
         }
 
-        $response = self::$instance->request('language-detection', [
+        $response = $this->instance->request('language-detection', [
             'text' => $text
         ]);
 
@@ -75,13 +79,13 @@ class SilverDiamond {
     }
 
     /**
-     * Returns true if the discovered language is equals to $isoCode
+     * Returns true if the discovered language is equals to `$isoCode`
      *
      * @param string $isoCode
      * @return void
      */
-    public static function languageIs (string $text, string $isoCode) {
-        $language = self::detectLanguage($text);
+    public function languageIs ($text, $isoCode) {
+        $language = $this->detectLanguage($text);
         $isoCode = mb_strtolower($isoCode);
         return $language === $isoCode;
     }
