@@ -278,7 +278,7 @@ class SilverDiamond {
      * @param string $ip
      * @return array
      */
-    private function _spam ($text, $ip = null) {
+    public function spam ($text, $ip = null) {
         $data = [
             'text' => $text
         ];
@@ -286,10 +286,10 @@ class SilverDiamond {
             if (!is_string($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
                 throw new InvalidRequestException('Invalid IP Address');
             }
-            
+
             $data['ip'] = $ip;
         }
-        
+
         $response = $this->instance->request('spam-detection', $data);
 
         if (!isset($response['spam']) || !isset($response['ham'])) {
@@ -301,7 +301,7 @@ class SilverDiamond {
 
     /**
      * Returns true if the provided text [and the IP Address] are classified as SPAM
-     * 
+     *
      * @param string $text
      * @param string $ip
      * @return boolean
@@ -314,7 +314,7 @@ class SilverDiamond {
 
     /**
      * Returns true if the provided text [and the IP Address] are classified as HAM
-     * 
+     *
      * @param string $text
      * @param string $ip
      * @return boolean
@@ -329,7 +329,7 @@ class SilverDiamond {
 
     /**
      * Returns the spam score of a certain text [and IP Address] between 0 and 10. Higher means more spam probability
-     * 
+     *
      * @param string $text
      * @param string $ip
      * @return integer
@@ -343,7 +343,7 @@ class SilverDiamond {
 
     /**
      * Checks if the text is not empty and removes the trailing and leading spaces
-     * 
+     *
      * @param string $text
      * @return string
      */
