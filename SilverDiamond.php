@@ -25,11 +25,6 @@ class Sentiment {
     const VERY_NEGATIVE = 'Very negative';
 }
 
-class Spam {
-    const SPAM = 'spam';
-    const HAM = 'ham';
-}
-
 class Api {
     private static $ENDPOINT = 'https://api.silverdiamond.io/api/service/';
     private $key;
