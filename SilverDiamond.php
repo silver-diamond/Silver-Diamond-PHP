@@ -3,8 +3,35 @@ namespace SilverDiamond;
 
 use \Curl\Curl;
 
+class InvalidRequestException extends \Exception {}
+
+class Language {
+    const SPANISH = 'es';
+    const ENGLISH = 'en';
+    const GERMAN = 'de';
+    const FRENCH = 'fr';
+    const PORTUGUESE = 'pt';
+    const ITALIAN = 'it';
+    const DUTCH = 'nl';
+    const POLISH = 'pl';
+    const RUSSIAN = 'ru';
+}
+
+class Sentiment {
+    const VERY_POSITIVE = 'Very positive';
+    const POSITIVE = 'Positive';
+    const NEUTRAL = 'Neutral';
+    const NEGATIVE = 'Negative';
+    const VERY_NEGATIVE = 'Very negative';
+}
+
+class Spam {
+    const SPAM = 'spam';
+    const HAM = 'ham';
+}
+
 class Api {
-    private static $ENDPOINT = 'http://silverdiamond.us-east-2.elasticbeanstalk.com/api/service/';
+    private static $ENDPOINT = 'https://api.silverdiamond.io/api/service/';
     private $key;
     private $curl;
 
@@ -21,9 +48,9 @@ class Api {
         $endpoint = trim($endpoint, '/');
         $this->curl->post(self::$ENDPOINT . $endpoint, $data);
         if ($this->curl->error) {
-            throw new Exception($this->curl->error);
+            throw new InvalidRequestException($this->curl->error);
         }
-        var_dump();
+
         if (!is_string($this->curl->response)) {
             $response = json_decode(json_encode($this->curl->response), true);
         } else {
@@ -31,22 +58,20 @@ class Api {
         }
 
         if (!$response) {
-            throw new Exception('Unknown error');
+            throw new InvalidRequestException('Unknown error');
         }
 
         if (isset($response['message'])) {
-            throw new Exception($response['message']);
+            throw new InvalidRequestException($response['message']);
         }
 
         if (isset($response['error'])) {
-            throw new Exception($response['error']);
+            throw new InvalidRequestException($response['error']);
         }
 
         return $response;
     }
 }
-
-class Exception extends \Exception {}
 
 class SilverDiamond {
     private $instance = null;
@@ -58,35 +83,284 @@ class SilverDiamond {
     /**
      * Returns the iso code of the detected `$text` language
      *
-     * @param string $isoCode
-     * @return void
+     * @param string $text
+     * @return Language
      */
     public function detectLanguage ($text) {
-        $text = trim($text);
-        if (empty($text)) {
-            throw new Exception('Text must not be empty');
-        }
+        $text = $this->_normalizeText($text);
 
         $response = $this->instance->request('language-detection', [
             'text' => $text
         ]);
 
         if (!isset($response['language'])) {
-            throw new Exception('Unknown error');
+            throw new InvalidRequestException('Unknown error');
         }
 
         return mb_strtolower($response['language']);
     }
 
     /**
-     * Returns true if the discovered language is equals to `$isoCode`
+     * Returns true if the discovered language is included in `$isoCodes`
      *
-     * @param string $isoCode
-     * @return void
+     * @param string $text
+     * @param string|array $isoCodes
+     * @return boolean
      */
-    public function languageIs ($text, $isoCode) {
+    public function languageIs ($text, $isoCodes) {
         $language = $this->detectLanguage($text);
-        $isoCode = mb_strtolower($isoCode);
-        return $language === $isoCode;
+        if (!is_array($isoCodes)) {
+            $isoCodes = [$isoCodes];
+        }
+
+        $isoCodes = array_map('mb_strtolower', $isoCodes);
+        return in_array($language, $isoCodes);
+    }
+
+    /**
+     * Returns true if the discovered language is Spanish
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsSpanish ($text) {
+        return $this->languageIs($text, [Language::SPANISH]);
+    }
+
+    /**
+     * Returns true if the discovered language is English
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsEnglish ($text) {
+        return $this->languageIs($text, [Language::ENGLISH]);
+    }
+
+    /**
+     * Returns true if the discovered language is German
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsGerman ($text) {
+        return $this->languageIs($text, [Language::GERMAN]);
+    }
+
+    /**
+     * Returns true if the discovered language is French
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsFrench ($text) {
+        return $this->languageIs($text, [Language::FRENCH]);
+    }
+
+    /**
+     * Returns true if the discovered language is Portuguese
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsPortuguese ($text) {
+        return $this->languageIs($text, [Language::PORTUGUESE]);
+    }
+
+    /**
+     * Returns true if the discovered language is Italian
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsItalian ($text) {
+        return $this->languageIs($text, [Language::ITALIAN]);
+    }
+
+    /**
+     * Returns true if the discovered language is Dutch
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsDutch ($text) {
+        return $this->languageIs($text, [Language::DUTCH]);
+    }
+
+    /**
+     * Returns true if the discovered language is Polish
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsPolish ($text) {
+        return $this->languageIs($text, [Language::POLISH]);
+    }
+
+    /**
+     * Returns true if the discovered language is Russian
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function languageIsRussian ($text) {
+        return $this->languageIs($text, [Language::RUSSIAN]);
+    }
+
+    /**
+     * Returns the overall sentiment detected in `$text`
+     *
+     * @param string $text
+     * @return Sentiment
+     */
+    public function detectSentiment ($text) {
+        $text = $this->_normalizeText($text);
+
+        $response = $this->instance->request('sentiment-analysis', [
+            'text' => $text
+        ]);
+
+        if (!isset($response['overall'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['overall'];
+    }
+
+
+    /**
+     * Returns true if the text sentiment is included in `$sentiments`
+     *
+     * @param string $text
+     * @param string|array $sentiments
+     * @return boolean
+     */
+    public function sentimentIs ($text, $sentiments) {
+        $sentiment = mb_strtolower($this->detectSentiment($text));
+
+        if (!is_array($sentiments)) {
+            $sentiments = [$sentiments];
+        }
+
+        $sentiments = array_map('mb_strtolower', $sentiments);
+        return in_array($sentiment, $sentiments);
+    }
+
+    /**
+     * Returns true if the text sentiment is classified as *Positive* or *Very positive*
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function sentimentIsPositive ($text) {
+        return $this->sentimentIs($text, [Sentiment::POSITIVE, Sentiment::VERY_POSITIVE]);
+    }
+
+    /**
+     * Returns true if the text sentiment is classified as *Neutral*
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function sentimentIsNeutral ($text) {
+        return $this->sentimentIs($text, [Sentiment::NEUTRAL]);
+    }
+
+    /**
+     * Returns true if the text sentiment is classified as *Negative* or *Very negative*
+     *
+     * @param string $text
+     * @return boolean
+     */
+    public function sentimentIsNegative ($text) {
+        return $this->sentimentIs($text, [Sentiment::NEGATIVE, Sentiment::VERY_NEGATIVE]);
+    }
+
+    /**
+     * Performs a spam detection API call and returns the response
+     *
+     * @param string $text
+     * @param string $ip
+     * @return array
+     */
+    private function _spam ($text, $ip = null) {
+        $data = [
+            'text' => $text
+        ];
+        if ($ip) {
+            if (!is_string($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
+                throw new InvalidRequestException('Invalid IP Address');
+            }
+            
+            $data['ip'] = $ip;
+        }
+        
+        $response = $this->instance->request('spam-detection', $data);
+
+        if (!isset($response['spam']) || !isset($response['ham'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response;
+    }
+
+    /**
+     * Returns true if the provided text [and the IP Address] are classified as SPAM
+     * 
+     * @param string $text
+     * @param string $ip
+     * @return boolean
+     */
+    public function isSpam ($text, $ip = null) {
+        $text = $this->_normalizeText($text);
+        $spam = $this->_spam($text, $ip);
+        return $spam['spam'] === true;
+    }
+
+    /**
+     * Returns true if the provided text [and the IP Address] are classified as HAM
+     * 
+     * @param string $text
+     * @param string $ip
+     * @return boolean
+     */
+    public function isHam ($text, $ip = null) {
+        $text = $this->_normalizeText($text);
+        $spam = $this->_spam($text, $ip);
+        return $spam['ham'] === true;
+    }
+
+
+
+    /**
+     * Returns the spam score of a certain text [and IP Address] between 0 and 10. Higher means more spam probability
+     * 
+     * @param string $text
+     * @param string $ip
+     * @return integer
+     */
+    public function spamScore ($text, $ip = null) {
+        $text = $this->_normalizeText($text);
+        $spam = $this->_spam($text, $ip);
+        return $spam['spamScore'];
+    }
+
+
+    /**
+     * Checks if the text is not empty and removes the trailing and leading spaces
+     * 
+     * @param string $text
+     * @return string
+     */
+    private function _normalizeText ($text) {
+        if (!is_string($text)) {
+            throw new InvalidRequestException('Text must be a string');
+        }
+
+        $text = trim($text);
+        if (empty($text)) {
+            throw new InvalidRequestException('Text must not be empty');
+        }
+        return $text;
     }
 }
