@@ -308,7 +308,7 @@ class SilverDiamond {
      */
     public function isSpam ($text, $ip = null) {
         $text = $this->_normalizeText($text);
-        $spam = $this->_spam($text, $ip);
+        $spam = $this->spam($text, $ip);
         return $spam['spam'] === true;
     }
 
@@ -321,7 +321,7 @@ class SilverDiamond {
      */
     public function isHam ($text, $ip = null) {
         $text = $this->_normalizeText($text);
-        $spam = $this->_spam($text, $ip);
+        $spam = $this->spam($text, $ip);
         return $spam['ham'] === true;
     }
 
@@ -336,8 +336,31 @@ class SilverDiamond {
      */
     public function spamScore ($text, $ip = null) {
         $text = $this->_normalizeText($text);
-        $spam = $this->_spam($text, $ip);
+        $spam = $this->spam($text, $ip);
         return $spam['spamScore'];
+    }
+
+    /**
+     * Returns the similarity of two texts between 0 and 1. Higher means more similar
+     * 
+     * @param string $text1
+     * @param string $text2
+     * @return float
+     */
+    public function similarity ($text1, $text2) {
+        $text1 = $this->_normalizeText($text1);
+        $text2 = $this->_normalizeText($text2);
+        $data = [
+            'texts' => [$text1, $text2]
+        ];
+
+        $response = $this->instance->request('short-text-similarity', $data);
+
+        if (!isset($response['similarity'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['similarity'];
     }
 
 
