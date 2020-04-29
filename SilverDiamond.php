@@ -410,7 +410,7 @@ class SilverDiamond {
      */
     public function genderIsMale ($name, $countryCode = null) {
         $gender = $this->gender($name, $countryCode);
-        return $gender === Gender::Male;
+        return $gender === Gender::MALE;
     }
 
     /**
@@ -422,7 +422,7 @@ class SilverDiamond {
      */
     public function genderIsFemale ($name, $countryCode = null) {
         $gender = $this->gender($name, $countryCode);
-        return $gender === Gender::Female;
+        return $gender === Gender::FEMALE;
     }
 
     /**
