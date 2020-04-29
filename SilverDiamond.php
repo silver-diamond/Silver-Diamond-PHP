@@ -221,11 +221,11 @@ class SilverDiamond {
             'text' => $text
         ]);
 
-        if (!isset($response['overall'])) {
+        if (!isset($response['sentiment'])) {
             throw new InvalidRequestException('Unknown error');
         }
 
-        return $response['overall'];
+        return $response['sentiment'];
     }
 
 
