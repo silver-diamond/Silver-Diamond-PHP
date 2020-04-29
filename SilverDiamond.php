@@ -26,7 +26,7 @@ class Sentiment {
 }
 
 class Api {
-    private static $ENDPOINT = 'https://api.silverdiamond.io/api/service/';
+    private static $ENDPOINT = 'https://api.silverdiamond.io/v1/service/';
     private $key;
     private $curl;
 
