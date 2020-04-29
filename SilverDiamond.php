@@ -425,6 +425,22 @@ class SilverDiamond {
         return $gender === Gender::Female;
     }
 
+    /**
+     * Returns a list of keywords extracted from the text
+     *
+     * @param string $text
+     * @return array
+     */
+    public function textRankKeywords ($text) {
+        $text = $this->_normalizeText($text);
+        $response = $this->instance->request('text-rank-keywords', $data);
+        if (!isset($response['keywords']) || !is_array($response['keywords'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['keywords'];
+    }
+
 
     /**
      * Checks if the text is not empty and removes the trailing and leading spaces
