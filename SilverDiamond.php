@@ -463,6 +463,32 @@ class SilverDiamond {
         return $response['summary'];
     }
 
+    /**
+     * Translates $text into $targetLang, optionally specifying $sourceLang
+     *
+     * @param string $text
+     * @param string $targetLang
+     * @param string $sourceLang
+     * @return string
+     */
+    public function translate ($text, $targetLang, $sourceLang = null) {
+        $text = $this->_normalizeText($text);
+        $data = [
+            'text' => $text,
+            'target_lang' => $targetLang
+        ];
+        if (isset($sourceLang)) {
+            $data['source_lang'] = $sourceLang;
+        }
+
+        $response = $this->instance->request('translation', $data);
+        if (!isset($response['translation'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['translation'];
+    }
+
 
     /**
      * Checks if the text is not empty and removes the trailing and leading spaces
