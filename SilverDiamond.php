@@ -385,7 +385,7 @@ class SilverDiamond {
             $data['country'] = $countryCode;
         }
 
-        $response = $this->instance->request('short-text-similarity', $data);
+        $response = $this->instance->request('gender-detection', $data);
         if (!isset($response['gender'])) {
             throw new InvalidRequestException('Unknown error');
         }
