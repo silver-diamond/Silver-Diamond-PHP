@@ -433,6 +433,9 @@ class SilverDiamond {
      */
     public function textRankKeywords ($text) {
         $text = $this->_normalizeText($text);
+        $data = [
+            'text' => $text
+        ];
         $response = $this->instance->request('text-rank-keywords', $data);
         if (!isset($response['keywords']) || !is_array($response['keywords'])) {
             throw new InvalidRequestException('Unknown error');
@@ -449,6 +452,9 @@ class SilverDiamond {
      */
     public function textRankSummary ($text) {
         $text = $this->_normalizeText($text);
+        $data = [
+            'text' => $text
+        ];
         $response = $this->instance->request('text-rank-summary', $data);
         if (!isset($response['summary'])) {
             throw new InvalidRequestException('Unknown error');
