@@ -25,6 +25,12 @@ class Sentiment {
     const VERY_NEGATIVE = 'Very negative';
 }
 
+class Gender {
+    const MALE = 'male';
+    const FEMALE = 'female';
+    const UNKNOWN = 'unknown';
+}
+
 class Api {
     private static $ENDPOINT = 'https://api.silverdiamond.io/v1/service/';
     private $key;
@@ -342,7 +348,7 @@ class SilverDiamond {
 
     /**
      * Returns the similarity of two texts between 0 and 1. Higher means more similar
-     * 
+     *
      * @param string $text1
      * @param string $text2
      * @return float
@@ -361,6 +367,62 @@ class SilverDiamond {
         }
 
         return $response['similarity'];
+    }
+
+    /**
+     * Returns the most likely gender from a name and, optionally, a country code
+     *
+     * @param string $name
+     * @param string $countryCode
+     * @return string
+     */
+    public function gender ($name, $countryCode = null) {
+        $name = $this->_normalizeText($name);
+        $data = [
+            'name' => $name
+        ];
+        if (isset($countryCode)) {
+            $data['country'] = $countryCode;
+        }
+
+        $response = $this->instance->request('short-text-similarity', $data);
+        if (!isset($response['gender'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        if (mb_strtolower($response['gender']) === Gender::MALE) {
+            return Gender::MALE;
+        }
+
+        if (mb_strtolower($response['gender']) === Gender::MALE) {
+            return Gender::FEMALE;
+        }
+
+        return Gender::UNKNOWN;
+    }
+
+    /**
+     * Returns true if the predicted gender is Male
+     *
+     * @param string $name
+     * @param string $countryCode
+     * @return boolean
+     */
+    public function genderIsMale ($name, $countryCode = null) {
+        $gender = $this->gender($name, $countryCode);
+        return $gender === Gender::Male;
+    }
+
+    /**
+     * Returns true if the predicted gender is Female
+     *
+     * @param string $name
+     * @param string $countryCode
+     * @return boolean
+     */
+    public function genderIsFemale ($name, $countryCode = null) {
+        $gender = $this->gender($name, $countryCode);
+        return $gender === Gender::Female;
     }
 
 
