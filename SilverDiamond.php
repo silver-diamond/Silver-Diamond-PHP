@@ -87,7 +87,7 @@ class SilverDiamond {
      * @param string $text
      * @return Language
      */
-    public function detectLanguage ($text) {
+    public function language ($text) {
         $text = $this->_normalizeText($text);
 
         $response = $this->instance->request('language-detection', [
@@ -109,7 +109,7 @@ class SilverDiamond {
      * @return boolean
      */
     public function languageIs ($text, $isoCodes) {
-        $language = $this->detectLanguage($text);
+        $language = $this->language($text);
         if (!is_array($isoCodes)) {
             $isoCodes = [$isoCodes];
         }
@@ -214,7 +214,7 @@ class SilverDiamond {
      * @param string $text
      * @return Sentiment
      */
-    public function detectSentiment ($text) {
+    public function sentiment ($text) {
         $text = $this->_normalizeText($text);
 
         $response = $this->instance->request('sentiment-analysis', [
@@ -237,7 +237,7 @@ class SilverDiamond {
      * @return boolean
      */
     public function sentimentIs ($text, $sentiments) {
-        $sentiment = mb_strtolower($this->detectSentiment($text));
+        $sentiment = mb_strtolower($this->sentiment($text));
 
         if (!is_array($sentiments)) {
             $sentiments = [$sentiments];
