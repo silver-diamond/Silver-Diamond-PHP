@@ -441,6 +441,22 @@ class SilverDiamond {
         return $response['keywords'];
     }
 
+    /**
+     * Returns a list of keywords extracted from the text
+     *
+     * @param string $text
+     * @return array
+     */
+    public function textRankSummary ($text) {
+        $text = $this->_normalizeText($text);
+        $response = $this->instance->request('text-rank-summary', $data);
+        if (!isset($response['summary'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['summary'];
+    }
+
 
     /**
      * Checks if the text is not empty and removes the trailing and leading spaces
