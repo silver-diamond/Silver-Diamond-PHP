@@ -370,62 +370,6 @@ class SilverDiamond {
     }
 
     /**
-     * Returns the most likely gender from a name and, optionally, a country code
-     *
-     * @param string $name
-     * @param string $countryCode
-     * @return string
-     */
-    public function gender ($name, $countryCode = null) {
-        $name = $this->_normalizeText($name);
-        $data = [
-            'name' => $name
-        ];
-        if (isset($countryCode)) {
-            $data['country'] = $countryCode;
-        }
-
-        $response = $this->instance->request('gender-detection', $data);
-        if (!isset($response['gender'])) {
-            throw new InvalidRequestException('Unknown error');
-        }
-
-        if (mb_strtolower($response['gender']) === Gender::MALE) {
-            return Gender::MALE;
-        }
-
-        if (mb_strtolower($response['gender']) === Gender::MALE) {
-            return Gender::FEMALE;
-        }
-
-        return Gender::UNKNOWN;
-    }
-
-    /**
-     * Returns true if the predicted gender is Male
-     *
-     * @param string $name
-     * @param string $countryCode
-     * @return boolean
-     */
-    public function genderIsMale ($name, $countryCode = null) {
-        $gender = $this->gender($name, $countryCode);
-        return $gender === Gender::MALE;
-    }
-
-    /**
-     * Returns true if the predicted gender is Female
-     *
-     * @param string $name
-     * @param string $countryCode
-     * @return boolean
-     */
-    public function genderIsFemale ($name, $countryCode = null) {
-        $gender = $this->gender($name, $countryCode);
-        return $gender === Gender::FEMALE;
-    }
-
-    /**
      * Returns a list of keywords extracted from the text
      *
      * @param string $text
