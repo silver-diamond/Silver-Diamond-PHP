@@ -9,6 +9,9 @@
         "php": ">=5.6",
         "php-curl-class/php-curl-class": "^8.6"
     },
+    "autoload": {
+        "classmap": ["SilverDiamond.php"]
+    },
     "license": "MIT",
     "authors": [
         {
