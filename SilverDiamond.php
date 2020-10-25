@@ -25,12 +25,6 @@ class Sentiment {
     const VERY_NEGATIVE = 'Very negative';
 }
 
-class Gender {
-    const MALE = 'male';
-    const FEMALE = 'female';
-    const UNKNOWN = 'unknown';
-}
-
 class Api {
     private static $ENDPOINT = 'https://api.silverdiamond.io/v1/service/';
     private $key;
