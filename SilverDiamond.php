@@ -25,6 +25,16 @@ class Sentiment {
     const VERY_NEGATIVE = 'Very negative';
 }
 
+class Readability {
+    const VERY_EASY = 'Very Easy';
+    const EASY = 'Easy';
+    const FAIRLY_EASY = 'Fairly Easy';
+    const STANDARD = 'Standard';
+    const FAIRLY_DIFFICULT = 'Fairly Difficult';
+    const DIFFICULT = 'Difficult';
+    const VERY_DIFFICULT = 'Very Difficult';
+}
+
 class Api {
     private static $ENDPOINT = 'https://api.silverdiamond.io/v1/service/';
     private $key;
@@ -427,6 +437,95 @@ class SilverDiamond {
         return $response['translation'];
     }
 
+    /**
+     * Returns the readability and readability scores of the provided $text written in $lang
+     *
+     * @param string $text
+     * @param string $lang
+     * @return Array
+     */
+    public function readability ($text, $lang = 'en') {
+        $text = $this->_normalizeText($text);
+        $data = [
+            'text' => $text,
+            'lang' => $lang
+        ];
+
+        $response = $this->instance->request('text-readability', $data);
+        if (!isset($response['score']) || !isset($response['readability'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response;
+    }
+
+    /**
+     * Returns a `Readability` value for the provided $text written in $lang
+     *
+     * @param string $text
+     * @param string $lang
+     * @return string
+     */
+    public function readabilityCategory ($text, $lang = 'en') {
+        $readability = $this->readability($text, $lang);
+        return $readability['readability'];
+    }
+
+    /**
+     * Returns the readability score for the provided $text written in $lang
+     *
+     * @param string $text
+     * @param string $lang
+     * @return float
+     */
+    public function readabilityScore ($text, $lang = 'en') {
+        $readability = $this->readability($text, $lang);
+        return $readability['score'];
+    }
+
+    /**
+     * Returns true if the readability of the provided $text written in $lang is in $readabilities
+     *
+     * @param [type] $text
+     * @param string $lang
+     * @param array $readabilities
+     * @return boolean
+     */
+    public function readabilityIs ($text, $lang = 'en', $readabilities = []) {
+        $readability = $this->readabilityCategory($text, $lang);
+        return in_array($readability, $readabilities);
+    }
+
+    /**
+     * Returns true if the given $text written in $lang is considered as readable
+     *
+     * @param string $text
+     * @param string $lang
+     * @return boolean
+     */
+    public function isReadable ($text, $lang = 'en') {
+        return $this->readabilityIs($text, $lang, [
+            Readability::VERY_EASY,
+            Readability::EASY,
+            Readability::FAIRLY_EASY,
+            Readability::STANDARD
+        ]);
+    }
+
+    /**
+     * Returns true if the given $text written in $lang is considered as not readable
+     *
+     * @param string $text
+     * @param string $lang
+     * @return boolean
+     */
+    public function isNotReadable ($text, $lang = 'en') {
+        return $this->readabilityIs($text, $lang, [
+            Readability::VERY_DIFFICULT,
+            Readability::DIFFICULT,
+            Readability::FAIRLY_DIFFICULT
+        ]);
+    }
 
     /**
      * Checks if the text is not empty and removes the trailing and leading spaces
