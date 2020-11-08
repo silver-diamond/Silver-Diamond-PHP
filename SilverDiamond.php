@@ -528,6 +528,27 @@ class SilverDiamond {
     }
 
     /**
+     * Generates an alt description for the given `$imageUrl` written in `$lang`
+     *
+     * @param string $imageUrl
+     * @param string $lang
+     * @return array
+     */
+    public function describeImage ($imageUrl, $lang = 'en') {
+        $data = [
+            'image_url' => $imageUrl,
+            'lang' => $lang
+        ];
+
+        $response = $this->instance->request('image-alt-detection', $data);
+        if (!isset($response['alt']) || !isset($response['confidence'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response;
+    }
+
+    /**
      * Checks if the text is not empty and removes the trailing and leading spaces
      *
      * @param string $text
