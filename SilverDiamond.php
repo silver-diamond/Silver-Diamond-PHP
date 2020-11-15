@@ -549,6 +549,30 @@ class SilverDiamond {
     }
 
     /**
+     * Returns the BERT Score for a given URL and Keyword.
+     * 
+     * BERT Score represents, from 0 to 100, how well the content of your URL
+     * answers the user's search intent.
+     *
+     * @param string $url
+     * @param string $keyword
+     * @return int
+     */
+    public function bertScore ($url, $keyword) {
+        $data = [
+            'url' => $url,
+            'keyword' => $keyword
+        ];
+
+        $response = $this->instance->request('bert-score', $data);
+        if (!isset($response['bert_score'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['bert_score'];
+    }
+
+    /**
      * Checks if the text is not empty and removes the trailing and leading spaces
      *
      * @param string $text
