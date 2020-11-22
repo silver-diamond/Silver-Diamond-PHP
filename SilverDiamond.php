@@ -573,6 +573,25 @@ class SilverDiamond {
     }
 
     /**
+     * Returns the detected objects inside $imageUrl
+     *
+     * @param string $imageUrl
+     * @return array
+     */
+    public function recognizeObjects ($imageUrl) {
+        $data = [
+            'image_url' => $imageUrl,
+        ];
+
+        $response = $this->instance->request('image-object-recognition', $data);
+        if (!isset($response['objects'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response['objects'];
+    }
+
+    /**
      * Checks if the text is not empty and removes the trailing and leading spaces
      *
      * @param string $text
