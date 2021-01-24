@@ -592,6 +592,47 @@ class SilverDiamond {
     }
 
     /**
+     * Runs a nudity detection analysis
+     *
+     * @param string $imageUrl
+     * @return array
+     */
+    public function nudityDetection ($imageUrl) {
+        $data = [
+            'image_url' => $imageUrl,
+        ];
+
+        $response = $this->instance->request('nudity-detection', $data);
+        if (!isset($response['has_nudity'])) {
+            throw new InvalidRequestException('Unknown error');
+        }
+
+        return $response;
+    }
+
+    /**
+     * Checks if the given image contains nudity.
+     *
+     * @param string $imageUrl
+     * @return boolean
+     */
+    public function hasNudity ($imageUrl) {
+        $response = $this->nudityDetection($imageUrl);
+        return $response['has_nudity'];
+    }
+
+    /**
+     * Returns the probability of the given image containing nudity.
+     *
+     * @param string $imageUrl
+     * @return boolean
+     */
+    public function nudityProbability ($imageUrl) {
+        $response = $this->nudityDetection($imageUrl);
+        return $response['probability'];
+    }
+
+    /**
      * Checks if the text is not empty and removes the trailing and leading spaces
      *
      * @param string $text
